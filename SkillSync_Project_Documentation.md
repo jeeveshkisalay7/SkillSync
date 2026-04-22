@@ -9,7 +9,7 @@
 -
 
 ## 2. Fulfillment of Compulsory Requirements
-This project strictly adheres to the requirements outlined by the course instructor. Here is a detailed breakdown of how each compulsory component has been implemented:
+This project of SkillSync strictly adheres to the requirements outlined by the course instructor. Here is a detailed breakdown of how each compulsory component has been implemented:
 
 ### 1. Minimum 3 Modules Apart from Login
 Beyond the comprehensive Authentication (Login/Register) module, the system is divided into three major functional modules based on user roles:
