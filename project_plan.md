@@ -216,19 +216,7 @@ To make the project look premium (without using Tailwind or Bootstrap):
 
 ---
 
-## 8. How to Demo this Project in a Viva (Presentation Tips)
 
-**Step 1: The Hook (2 mins)**
-Don't start by explaining the code. Start with the problem. *"Traditional job portals just let you apply and hope for the best. Skill Sync solves the black box of hiring by telling you exactly WHY you might be rejected, and HOW to fix it."*
-
-**Step 2: The Demo (3 mins)**
-1.  Log in as a Recruiter and post a Job requiring "React, Node, Redis".
-2.  Log in as a Seeker whose profile only has "React and Node".
-3.  Click "Apply". Show the magic moment: **"The Skill Gap Analyzer kicks in!"**
-4.  Show the result UI: It flags 66% match, highlights 'Redis' as missing, and generates a learning path. 
-
-**Step 3: The Architecture & Code (2 mins)**
-Briefly show your MongoDB schemas and explain the MERN flow. Highlight how you separated the frontend and backend using standard REST API conventions. Briefly display the `analyzeSkills.js` function you wrote, emphasizing that the system computes the match intelligently without relying on expensive 3rd party APIs.
 
 
 
