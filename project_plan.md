@@ -113,6 +113,7 @@ Maps seekers to the jobs they applied for. Includes the AI Analyzer metric.
 2. Create `authMiddleware.js` to protect routes and verify roles (e.g. `isRecruiter`).
 3. Develop CRUD endpoints for Jobs and Applications.
 
+
 ### Phase 3: The AI Skill Gap Analyzer (Day 5)
 1. Build a utility function that accepts two arrays: `userSkills` and `jobRequiredSkills`.
 2. Calculate the intersection (matched skills) and differences (missing skills).
@@ -228,6 +229,8 @@ Don't start by explaining the code. Start with the problem. *"Traditional job po
 
 **Step 3: The Architecture & Code (2 mins)**
 Briefly show your MongoDB schemas and explain the MERN flow. Highlight how you separated the frontend and backend using standard REST API conventions. Briefly display the `analyzeSkills.js` function you wrote, emphasizing that the system computes the match intelligently without relying on expensive 3rd party APIs.
+
+
 
 **Step 4: Future Scope (1 min)**
 Finish by stating you could easily upgrade the "AI Algorithm" to use Python NLP models in the future, demonstrating that you designed the structure to be highly scalable.
