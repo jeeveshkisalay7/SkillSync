@@ -6,7 +6,7 @@
 ## 1. Abstract & Objective
 **Skill Sync** is a modern, responsive, full-stack Job Portal System built using the MERN stack. It goes beyond traditional job boards by offering an **Intelligent Skill Gap Analyzer**. The platform is designed to provide an intuitive workflow for different types of users, automatically matching candidates to jobs based on their real skill sets.
 
----
+-
 
 ## 2. Fulfillment of Compulsory Requirements
 This project strictly adheres to the requirements outlined by the course instructor. Here is a detailed breakdown of how each compulsory component has been implemented:
