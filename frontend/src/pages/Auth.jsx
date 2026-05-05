@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../utils/api';
 import { Briefcase } from 'lucide-react';
 
 const Auth = () => {
@@ -26,14 +26,14 @@ const Auth = () => {
         setError('');
         
         try {
-            const endpoint = isLogin ? 'http://localhost:5000/api/auth/login' : 'http://localhost:5000/api/auth/register';
+            const endpoint = isLogin ? '/auth/login' : '/auth/register';
             
             const payload = { ...formData };
             if (!isLogin && payload.role === 'seeker') {
                 payload.skills = payload.skills.split(',').map(s => s.trim());
             }
 
-            const res = await axios.post(endpoint, payload);
+            const res = await api.post(endpoint, payload);
             login(res.data);
         } catch (err) {
             setError(err.response?.data?.error || 'Authentication Failed');

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 import { ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
@@ -28,10 +28,10 @@ const SkillAnalyzer = () => {
 
     const fetchSeekerAnalysis = async () => {
         try {
-            const jobRes = await axios.get(`http://localhost:5000/api/jobs/${jobId}`);
+            const jobRes = await api.get(`/jobs/${jobId}`);
             setJobDetails(jobRes.data);
             
-            const analysisRes = await axios.post('http://localhost:5000/api/analyze-skills', {
+            const analysisRes = await api.post('/analyze-skills', {
                 requiredSkills: jobRes.data.requiredSkills
             }, {
                 headers: { Authorization: `Bearer ${user.token}` }
@@ -42,7 +42,7 @@ const SkillAnalyzer = () => {
 
     const fetchApplications = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/applications/job/${jobId}`, {
+            const res = await api.get(`/applications/job/${jobId}`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setApplications(res.data);
@@ -51,7 +51,7 @@ const SkillAnalyzer = () => {
 
     const updateStatus = async (appId, status) => {
         try {
-            await axios.put(`http://localhost:5000/api/applications/${appId}/status`, { status }, {
+            await api.put(`/applications/${appId}/status`, { status }, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             fetchApplications();
@@ -60,7 +60,7 @@ const SkillAnalyzer = () => {
 
     const handleApply = async () => {
         try {
-            await axios.post('http://localhost:5000/api/applications', { jobId }, {
+            await api.post('/applications', { jobId }, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             alert('Applied successfully!');

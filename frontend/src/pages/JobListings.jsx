@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, DollarSign, Briefcase } from 'lucide-react';
@@ -14,7 +14,7 @@ const JobListings = () => {
     const fetchJobs = async (query = '') => {
         setLoading(true);
         try {
-            const res = await axios.get(`http://localhost:5000/api/external-jobs?search=${query}`);
+            const res = await api.get(`/external-jobs?search=${query}`);
             setJobs(res.data);
         } catch(e) { 
             console.error(e); 
@@ -33,7 +33,7 @@ const JobListings = () => {
 
     const handleApply = async (jobId) => {
         try {
-            await axios.post('http://localhost:5000/api/applications', {
+            await api.post('/applications', {
                 jobId,
                 resumeUrl: 'https://example.com/resume.pdf'
             }, {

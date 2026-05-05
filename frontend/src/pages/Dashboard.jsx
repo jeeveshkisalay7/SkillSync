@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../utils/api';
 import { Link } from 'react-router-dom';
 import { Briefcase, CheckCircle, Clock, XCircle, Users, Trash2, Edit } from 'lucide-react';
 
@@ -21,14 +21,14 @@ const Dashboard = () => {
 
     const fetchRecruiterData = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/jobs');
+            const res = await api.get('/jobs');
             setJobs(res.data.filter(j => j.postedBy?.email === user.email));
         } catch (err) { console.error(err); }
     };
 
     const fetchSeekerData = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/applications/my', {
+            const res = await api.get('/applications/my', {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setApplications(res.data);
@@ -39,8 +39,8 @@ const Dashboard = () => {
         try {
             const headers = { Authorization: `Bearer ${user.token}` };
             const [usersRes, jobsRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/admin/users', { headers }),
-                axios.get('http://localhost:5000/api/jobs')
+                api.get('/admin/users', { headers }),
+                api.get('/jobs')
             ]);
             setAllUsers(usersRes.data);
             setAllJobs(jobsRes.data);
@@ -51,7 +51,7 @@ const Dashboard = () => {
         e.preventDefault();
         try {
             const payload = { ...newJob, requiredSkills: newJob.requiredSkills.split(',').map(s => s.trim()) };
-            const res = await axios.post('http://localhost:5000/api/jobs', payload, {
+            const res = await api.post('/jobs', payload, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setJobs([res.data, ...jobs]);
@@ -61,7 +61,7 @@ const Dashboard = () => {
 
     const handleDeleteJob = async (id, isAdmin = false) => {
         try {
-            await axios.delete(`http://localhost:5000/api/${isAdmin ? 'admin/' : ''}jobs/${id}`, {
+            await api.delete(`/${isAdmin ? 'admin/' : ''}jobs/${id}`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             if (isAdmin) setAllJobs(allJobs.filter(j => j._id !== id));
@@ -71,7 +71,7 @@ const Dashboard = () => {
 
     const handleDeleteUser = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+            await api.delete(`/admin/users/${id}`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setAllUsers(allUsers.filter(u => u._id !== id));
