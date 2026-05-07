@@ -5,7 +5,11 @@ const { registerUser, loginUser, getMe } = require('../controllers/authControlle
 const { getJobs, getJobById, createJob, updateJob, deleteJob, getExternalJobs } = require('../controllers/jobController');
 const { applyForJob, getApplicationsForJob, getMyApplications, updateApplicationStatus, analyzeSkillGap } = require('../controllers/appController');
 const { getAllUsers, deleteUser, deleteJob: adminDeleteJob } = require('../controllers/adminController');
+const { extractCV, saveCVProfile } = require('../controllers/cvController');
 const { protect, isRecruiter, isAdmin } = require('../middlewares/authMiddleware');
+const multer = require('multer');
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Auth routes
 router.post('/auth/register', registerUser);
@@ -30,6 +34,10 @@ router.post('/applications', protect, applyForJob); // Seeker applies
 router.get('/applications/my', protect, getMyApplications); // Seeker lists their apps
 router.get('/applications/job/:jobId', protect, isRecruiter, getApplicationsForJob); // Recruiter lists apps
 router.put('/applications/:id/status', protect, isRecruiter, updateApplicationStatus); // Recruiter updates state
+
+// CV routes
+router.post('/cv/extract', protect, upload.single('cvFile'), extractCV);
+router.post('/cv/save', protect, saveCVProfile);
 
 // Skill Analyzer separate route
 router.post('/analyze-skills', protect, analyzeSkillGap);

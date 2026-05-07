@@ -13,6 +13,46 @@ const Dashboard = () => {
 
     const [newJob, setNewJob] = useState({ title: '', description: '', companyName: '', requiredSkills: '' });
 
+    const [showCVModal, setShowCVModal] = useState(false);
+    const [cvFile, setCvFile] = useState(null);
+    const [extracting, setExtracting] = useState(false);
+    const [extractedData, setExtractedData] = useState(null);
+
+    const handleCVExtract = async () => {
+        if (!cvFile) return alert('Please select a file');
+        setExtracting(true);
+        const formData = new FormData();
+        formData.append('cvFile', cvFile);
+        try {
+            const res = await api.post('/cv/extract', formData, {
+                headers: { 
+                    Authorization: `Bearer ${user.token}`
+                }
+            });
+            setExtractedData({...res.data.extractedData, filename: res.data.filename});
+        } catch (err) {
+            console.error(err);
+            alert(err.response?.data?.error || err.message || 'Failed to extract CV.');
+        } finally {
+            setExtracting(false);
+        }
+    };
+
+    const handleCVSave = async () => {
+        try {
+            await api.post('/cv/save', extractedData, {
+                headers: { Authorization: `Bearer ${user.token}` }
+            });
+            alert('Profile updated successfully!');
+            setShowCVModal(false);
+            setExtractedData(null);
+            setCvFile(null);
+        } catch (err) {
+            console.error(err);
+            alert('Failed to save profile');
+        }
+    };
+
     useEffect(() => {
         if (user.role === 'recruiter') fetchRecruiterData();
         else if (user.role === 'seeker') fetchSeekerData();
@@ -156,40 +196,46 @@ const Dashboard = () => {
 
             {/* SEEKER VIEW */}
             {user.role === 'seeker' && (
-                <div className="grid grid-cols-3">
-                    {applications.map(app => (
-                        <div key={app._id} className="glass-panel">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                                <div>
-                                    <h4 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '4px' }}>{app.jobId?.title || 'Job Unavailable'}</h4>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{app.jobId?.companyName}</p>
-                                </div>
-                                <div style={{ background: '#f8fafc', padding: '8px', borderRadius: '50%', color: 'var(--accent-primary)' }}>
-                                    <Briefcase size={20} />
-                                </div>
-                            </div>
-                            
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: app.matchPercentage > 75 ? 'var(--success)' : 'var(--accent-primary)' }}>
-                                    {app.matchPercentage}%
-                                </div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Skill Match Score</div>
-                            </div>
+                <div>
+                    <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                        <button className="btn btn-primary" onClick={() => setShowCVModal(true)}>Upload CV to Auto-fill Profile</button>
+                    </div>
 
-                            <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <StatusBadge status={app.status} />
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                    {new Date(app.appliedAt).toLocaleDateString()}
-                                </span>
+                    <div className="grid grid-cols-3">
+                        {applications.map(app => (
+                            <div key={app._id} className="glass-panel">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                                    <div>
+                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '4px' }}>{app.jobId?.title || 'Job Unavailable'}</h4>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{app.jobId?.companyName}</p>
+                                    </div>
+                                    <div style={{ background: '#f8fafc', padding: '8px', borderRadius: '50%', color: 'var(--accent-primary)' }}>
+                                        <Briefcase size={20} />
+                                    </div>
+                                </div>
+                                
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: app.matchPercentage > 75 ? 'var(--success)' : 'var(--accent-primary)' }}>
+                                        {app.matchPercentage}%
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Skill Match Score</div>
+                                </div>
+
+                                <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <StatusBadge status={app.status} />
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                        {new Date(app.appliedAt).toLocaleDateString()}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                    {applications.length === 0 && (
-                        <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px', background: 'white', borderRadius: '16px', border: '1px dashed var(--glass-border)' }}>
-                            <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>You haven't applied to any jobs yet.</p>
-                            <Link to="/jobs" className="btn btn-primary">Browse Jobs</Link>
-                        </div>
-                    )}
+                        ))}
+                        {applications.length === 0 && (
+                            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px', background: 'white', borderRadius: '16px', border: '1px dashed var(--glass-border)' }}>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>You haven't applied to any jobs yet.</p>
+                                <Link to="/jobs" className="btn btn-primary">Browse Jobs</Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -256,6 +302,67 @@ const Dashboard = () => {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* CV Upload Modal */}
+            {showCVModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div className="glass-panel" style={{ width: '90%', maxWidth: '600px', background: 'white', padding: '32px' }}>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '16px', fontWeight: 600 }}>Upload CV to Auto-fill Profile</h2>
+                        {!extractedData ? (
+                            <div>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>Upload your PDF resume to automatically extract your skills, experience, and education using AI.</p>
+                                <input type="file" accept="application/pdf" onChange={(e) => setCvFile(e.target.files[0])} className="form-input" style={{ marginBottom: '16px' }} />
+                                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                                    <button className="btn btn-outline" onClick={() => setShowCVModal(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleCVExtract} disabled={extracting || !cvFile}>
+                                        {extracting ? 'Extracting...' : 'Extract Info'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <p style={{ color: 'var(--success)', marginBottom: '16px', fontWeight: 500 }}>We found these details from your CV — confirm or edit.</p>
+                                
+                                <div style={{ maxHeight: '400px', overflowY: 'auto', marginBottom: '16px', paddingRight: '8px' }}>
+                                    <div className="form-group">
+                                        <label>Name</label>
+                                        <input type="text" className="form-input" value={extractedData.name || ''} onChange={e => setExtractedData({...extractedData, name: e.target.value})} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Phone</label>
+                                        <input type="text" className="form-input" value={extractedData.phone || ''} onChange={e => setExtractedData({...extractedData, phone: e.target.value})} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Skills (comma separated)</label>
+                                        <input type="text" className="form-input" value={extractedData.skills?.join(', ') || ''} onChange={e => setExtractedData({...extractedData, skills: e.target.value.split(',').map(s=>s.trim())})} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Experience</label>
+                                        {extractedData.experience?.map((exp, idx) => (
+                                            <div key={idx} style={{ marginBottom: '8px', padding: '8px', background: '#f8fafc', borderRadius: '4px' }}>
+                                                <strong>{exp.title}</strong> at {exp.company} ({exp.duration})
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Education</label>
+                                        {extractedData.education?.map((edu, idx) => (
+                                            <div key={idx} style={{ marginBottom: '8px', padding: '8px', background: '#f8fafc', borderRadius: '4px' }}>
+                                                <strong>{edu.degree}</strong>, {edu.institution} ({edu.year})
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                                    <button className="btn btn-outline" onClick={() => setExtractedData(null)}>Back</button>
+                                    <button className="btn btn-primary" onClick={handleCVSave}>Save to Profile</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
